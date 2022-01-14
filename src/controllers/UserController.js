@@ -1,5 +1,7 @@
 const InvoiceModel = require("../models").Invoice;
 const UserModel = require("../models").User;
+const bcrypt = require("bcrypt");
+const JWT = require("jsonwebtoken");
 
 const uploadInvoice = async (req, res) => {
   try {
@@ -63,10 +65,22 @@ const registerUser = async (req, res) => {
   try {
     let { name, email, password, role } = req.body;
 
+    let alreadyExist = await UserModel.findOne({ where: { email: email } });
+
+    if (alreadyExist) {
+      return res.status(400).json({
+        statusCode: 400,
+        status: true,
+        message: "Bad Request",
+        payload: "User Already Exist",
+      });
+    }
+
+    encryptedPassword = await bcrypt.hash(password, 10);
     let result = await UserModel.create({
       name: name,
       email: email,
-      password: password,
+      password: encryptedPassword,
       role: role,
       status: "active",
     });
@@ -94,17 +108,24 @@ const loginUser = async (req, res) => {
     let result = await UserModel.findOne({
       where: {
         email: email,
-        password: password,
       },
     });
 
-    console.log(result);
+    if (result && (await bcrypt.compare(password, result.password))) {
+      //create JWT token
+      const token = JWT.sign(
+        { user_id: result.id, email: result.email, role: result.role },
+        process.env.JWT_PVT_KEY,
+        {
+          expiresIn: "30d",
+        }
+      );
 
-    if (result) {
       let response = {};
       response.name = result.name;
       response.email = result.email;
       response.role = result.role;
+      response.token = token;
       res.status(200).json({
         statusCode: 200,
         status: true,
