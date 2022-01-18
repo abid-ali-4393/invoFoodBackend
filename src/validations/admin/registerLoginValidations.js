@@ -2,7 +2,7 @@ const Joi = require("joi");
 const { validateRequest } = require("../validateRequestGeneric");
 const registerValidation = (req, res, next) => {
   const schema = Joi.object({
-    userName: Joi.string().required(),
+    name: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.string().required(),
     role: Joi.string().valid("Admin", "User").required(),
@@ -13,7 +13,7 @@ const registerValidation = (req, res, next) => {
 const loginValidation = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().min(2).required(),
+    password: Joi.string().min(8).required(),
   });
   validateRequest(req, res, next, schema);
 };

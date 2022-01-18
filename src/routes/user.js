@@ -18,8 +18,8 @@ router.post(
   uploadInvoiceValidation,
   UserController.uploadInvoice
 );
-router.post("/register", auth, registerValidation, UserController.registerUser);
-router.post("/login", auth, loginValidation, UserController.loginUser);
+router.post("/register", registerValidation, UserController.registerUser);
+router.post("/login", loginValidation, UserController.loginUser);
 router.get("/user-invoices", auth, UserController.userInvoicesList);
 
 module.exports = router;

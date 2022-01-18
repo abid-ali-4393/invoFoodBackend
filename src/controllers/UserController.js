@@ -85,6 +85,9 @@ const registerUser = async (req, res) => {
       status: "active",
     });
 
+    console.log(result.dataValues);
+    let response = {};
+
     res.status(200).json({
       statusCode: 200,
       status: true,
